@@ -1,5 +1,9 @@
 import os
+import sys
 
+class AlreadyMarked(Exception):
+    def __init__(self, message = None):
+        super().__init__(message)
 class Grid:
     def __init__(self):
         self.__grid = [["_" for _ in range(3)] for _ in range(3)]
@@ -10,10 +14,21 @@ class Grid:
             print(row)
 
     def mark(self, player):
-        row = int(input("row = "))
-        column = int(input("column = "))
+        _player = player
 
-        self.__grid[row][column] = player.draw()
+        try:
+            row = int(input("row = "))
+            if row == "^Z":
+                sys.exit()
+            column = int(input("column = "))
+
+            if self.__grid[row][column] != "_":
+                raise AlreadyMarked 
+            self.__grid[row][column] = player.draw()
+        except (ValueError, IndexError, AlreadyMarked):
+            os.system('cls')
+            self.display_the_grid()
+            self.mark(_player)
 
     def is_draw(self):
         if all("_" not in item for item in self.__grid):
